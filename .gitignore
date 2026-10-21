@@ -1,0 +1,13 @@
+# Run outputs and the original task records (not included)
+runs/
+paper/public-data/
+
+# Secrets
+.env
+key*.md
+*.key
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/

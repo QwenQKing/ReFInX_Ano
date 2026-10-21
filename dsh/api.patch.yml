@@ -1,0 +1,24 @@
+# Overlay for API models (refinx.run --provider api), applied after refinx.patch.yml:
+#   dsh --profile headless --patch dsh/refinx.patch.yml --patch dsh/api.patch.yml ...
+# Thinking at the lowest setting the route offers: route level "off". REFINX_REASONING_OFF is the wire value
+# for "off": unset sends no reasoning parameter (for a model that does not think by default); "none" sends
+# reasoning_effort="none". DSH requires one level beyond "off" to be declared.
+# A patch replaces a row's whole config, so the provider is restated in full.
+- id: llm-pi-ai
+  config:
+    providers:
+      refinx:
+        api: openai-completions
+        baseURL: !!js process.env.REFINX_LLM_BASE_URL
+        apiKeyEnv: REFINX_LLM_API_KEY
+        defaultMaxTokens: 8192   # paper: 8,192 output tokens
+        timeoutMs: 90000         # paper: 90 s single-request timeout
+        reasoning: "off"
+        models:
+          - id: !!js process.env.REFINX_AGENT_MODEL
+            # API routes accept longer contexts than the locally served models' 131072 tokens; tasks whose
+            # largest prompt exceeds 122880 tokens are marked unobservable afterwards (refinx/context_overflow.py).
+            contextWindow: 262144
+            reasoningEfforts:
+              "off": !!js process.env.REFINX_REASONING_OFF || null
+              low: low
